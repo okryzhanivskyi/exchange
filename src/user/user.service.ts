@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
@@ -35,6 +35,10 @@ export class UserService {
   }
 
   async getUser(id: string): Promise<User> {
+    if (!isValidObjectId(id)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     return this.userModel.findById(id);
   }
 
@@ -45,6 +49,10 @@ export class UserService {
   }
 
   async deleteUserById(userId: string): Promise<any> {
+    if (!isValidObjectId(userId)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     const user = await this.userModel.findByIdAndRemove(userId).select('-password');
     if (!user) {
       this.exceptionManager.throwException(ExceptionKey.USER_WAS_NOT_FOUND);
@@ -53,6 +61,10 @@ export class UserService {
   }
 
   async updateUserById(userId: string, data: UpdateUserDto): Promise<any> {
+    if (!isValidObjectId(userId)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     const user = await this.getUser(userId);
     if (!user) {
       this.exceptionManager.throwException(ExceptionKey.USER_WAS_NOT_FOUND);
@@ -102,6 +114,10 @@ export class UserService {
   }
 
   async addChannelToUser(userId: string, channelId: string): Promise<User> {
+    if (!isValidObjectId(userId) || !isValidObjectId(channelId)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     const userWithChannel = await this.userModel.findByIdAndUpdate(
       userId,
       { $push: {"channels": channelId }},
@@ -111,6 +127,10 @@ export class UserService {
   }
 
   async removeChannelFromUser(userId: string, channelId: string): Promise<User> {
+    if (!isValidObjectId(userId) || !isValidObjectId(channelId)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     const updateResult = await this.userModel.updateOne({ _id: new Types.ObjectId(userId) }, {
       $pullAll: {
         channels: [channelId],

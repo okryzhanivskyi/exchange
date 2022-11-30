@@ -1,7 +1,7 @@
 import { Injectable, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Model, Types } from 'mongoose';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import { diskStorage } from 'multer';
 import { ExceptionManager, ExceptionKey } from 'src/helpers/exception.helper';
 import { CreatePictureDto } from './dto/create-picture.dto';
@@ -32,6 +32,10 @@ export class PictureService {
   }
 
   async removeChannelFromPicture(pictureId: string, channelId: string): Promise<Picture> {
+    if (!isValidObjectId(channelId) || !isValidObjectId(pictureId)) {
+      this.exceptionManager.throwException(ExceptionKey.IS_INVALID_ID);
+    }
+
     const updateResult = await this.pictureModel.updateOne({ _id: new Types.ObjectId(pictureId) }, {
       $pullAll: {
         channels: [channelId],

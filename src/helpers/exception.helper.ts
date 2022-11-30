@@ -10,6 +10,7 @@ export const enum ExceptionKey {
   PROVIDE_CHANGE_PASSWORD_PARAMS = 'PROVIDE_CHANGE_PASSWORD_PARAMS',
   OLD_PASSWORD_IS_NOT_CORRECT = 'OLD_PASSWORD_IS_NOT_CORRECT',
   ENTITY_HAS_NOT_BEEN_UPDATED = 'ENTITY_HAS_NOT_BEEN_UPDATED',
+  IS_INVALID_ID = 'IS_INVALID_ID',
 }
 
 @Injectable()
@@ -59,6 +60,11 @@ export class ExceptionManager {
       key: ExceptionKey.ENTITY_HAS_NOT_BEEN_UPDATED,
       message: 'The entity has not been updated',
       status: HttpStatus.NOT_FOUND,
+    },
+    {
+      key: ExceptionKey.IS_INVALID_ID,
+      message: 'Invalid Id',
+      status: HttpStatus.BAD_REQUEST,
     }
   ];
 
